@@ -1,26 +1,18 @@
 ---
-- name: Monitor App Health
-  hosts: localhost
+- name: Monitor Web Server Health
+  hosts: all
   gather_facts: false
-  vars:
-    # REPLACE THIS with your actual app URL
-    target_url: "http://<YOUR_EC2_IP_OR_DNS_HERE>"
-
+  
   tasks:
-    - name: Check Website Status
+    - name: Check Website Status (Internal)
       ansible.builtin.uri:
-        url: "{{ target_url }}"
+        url: "http://localhost"
         status_code: 200
         return_content: no
       register: result
       ignore_errors: true
 
-    - name: Report Failure
+    - name: Report Failure if Site is Down
       ansible.builtin.fail:
-        msg: "CRITICAL ALERT: Application is DOWN!"
-      when: result.status != 200
-
-    - name: Report Success
-      ansible.builtin.debug:
-        msg: "SYSTEM OK: Application is running normally."
-      when: result.status == 200
+        msg: "CRITICAL ALERT: Web Server is unreachable!"
+      when: result.status is undefined or result.status != 200
