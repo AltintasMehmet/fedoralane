@@ -1,15 +1,19 @@
 ---
+# PLAY 1: Bootstrap the Server (Fix Missing Dependencies)
+- name: Bootstrap Server Requirements
+  hosts: all
+  gather_facts: false
+  become: false  # Important: Run as ec2-user, don't try to become root yet
+  tasks:
+    - name: Install ACL package via raw SSH
+      raw: sudo dnf install -y acl
+      changed_when: false
+
+# PLAY 2: The Actual Application Deployment
 - name: Deploy Fedora Lane App
   hosts: all
-  become: true
-  vars:
-    web_content: |
-      <html><body style="background-color:#e6f7ff; text-align:center; padding:50px;">
-      <div style="border:4px solid #0077cc; padding:20px; display:inline-block; border-radius:10px;">
-      <h1 style="color:#0077cc;">🚀 Fedora Lane App</h1>
-      <p>Status: <strong>OPERATIONAL</strong></p>
-      <p>Version: 1.0 (Deployed by Ansible)</p>
-      </div></body></html>
+  become: true   # Now we can become root safely
+  gather_facts: false
 
   tasks:
     - name: Install Apache (httpd)
@@ -25,6 +29,6 @@
 
     - name: Deploy Application Code
       ansible.builtin.copy:
-        content: "{{ web_content }}"
+        content: "<html><body><h1>🚀 System Online</h1></body></html>"
         dest: /var/www/html/index.html
         mode: '0644'
