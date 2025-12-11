@@ -1,0 +1,24 @@
+---
+- name: Fix / Remediate App
+  hosts: all
+  become: true
+  vars:
+    remedy_content: |
+      <html><body style="background-color:#e8f5e9; text-align:center; padding:50px;">
+      <div style="border:4px solid #2e7d32; padding:20px; display:inline-block; border-radius:10px;">
+      <h1 style="color:#2e7d32;">✅ SYSTEM HEALED</h1>
+      <p>Automatic Remediation Complete</p>
+      <p>Restored by: <strong>Ansible Automation Platform</strong></p>
+      </div></body></html>
+
+  tasks:
+    - name: Force Service Restart
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+        enabled: true
+
+    - name: Restore Index File
+      ansible.builtin.copy:
+        content: "{{ remedy_content }}"
+        dest: /var/www/html/index.html
