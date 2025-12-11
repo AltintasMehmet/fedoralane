@@ -27,9 +27,18 @@
         name: httpd
         state: started
         enabled: true
-
-    - name: Deploy Application Code
+        
+    - name: Deploy Dynamic Web Page
       ansible.builtin.copy:
-        content: "<html><body><h1>🚀 System Online</h1></body></html>"
+        content: |
+          <html>
+          <body style="font-family: sans-serif; text-align: center; padding: 50px;">
+            <div style="border: 2px solid #0077cc; padding: 20px; border-radius: 10px; display: inline-block;">
+              <h1 style="color: #0077cc;">🚀 Fedora Lane App</h1>
+              <h2>{{ custom_message }}</h2>
+              <p>Updated via Ansible Survey</p>
+            </div>
+          </body>
+          </html>
         dest: /var/www/html/index.html
         mode: '0644'
