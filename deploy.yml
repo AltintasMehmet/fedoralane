@@ -1,7 +1,6 @@
 ---
 - name: Deploy Fedora Lane App
   hosts: all
-  become: true
   vars:
     web_content: |
       <html><body style="background-color:#e6f7ff; text-align:center; padding:50px;">
