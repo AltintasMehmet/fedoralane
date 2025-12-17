@@ -1,18 +1,21 @@
 ---
-- name: Auto-Heal Web Server
+- name: Fix Netdata issues
   hosts: all
-  become: true
-  gather_facts: false
-  
-  tasks:
-    - name: 1. Force Apache Service Restart
-      ansible.builtin.service:
-        name: httpd
-        state: started
-        enabled: true
+  become: yes
 
-    - name: 2. Restore Critical Data (Index File)
-      ansible.builtin.copy:
-        content: "<html><body><h1 style='color:green'>✅ System Restored</h1><p>Maintenance completed by Ansible Automation Platform.</p></body></html>"
-        dest: /var/www/html/index.html
-        mode: '0644'
+  tasks:
+    - name: Ensure Netdata config dir exists
+      file:
+        path: /etc/netdata
+        state: directory
+
+    - name: Restart Netdata
+      systemd:
+        name: netdata
+        state: restarted
+
+    - name: Wait for Netdata to respond
+      uri:
+        url: http://localhost:19999
+        status_code: 200
+        timeout: 5
