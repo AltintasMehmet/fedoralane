@@ -1,0 +1,62 @@
+---
+- name: Success follow-up – Victory Page
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Install httpd
+      yum:
+        name: httpd
+        state: present
+
+    - name: Create custom web root
+      file:
+        path: /var/www/victory
+        state: directory
+        mode: '0755'
+
+    - name: Deploy victory HTML page
+      copy:
+        dest: /var/www/victory/index.html
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Deployment Successful</title>
+            <style>
+              body {
+                background: black;
+                color: #00ffcc;
+                font-family: monospace;
+                text-align: center;
+                margin-top: 10%;
+              }
+              h1 { font-size: 3em; }
+            </style>
+          </head>
+          <body>
+            <h1>🏆 DEPLOYMENT SUCCESSFUL 🏆</h1>
+            <p>Netdata is alive.</p>
+            <p>The server did not explode.</p>
+            <p><b>FUS ROH DEPLOY</b></p>
+          </body>
+          </html>
+
+    - name: Configure httpd on port 8081
+      copy:
+        dest: /etc/httpd/conf.d/victory.conf
+        content: |
+          Listen 8081
+          <VirtualHost *:8081>
+              DocumentRoot /var/www/victory
+              <Directory /var/www/victory>
+                  AllowOverride None
+                  Require all granted
+              </Directory>
+          </VirtualHost>
+
+    - name: Restart httpd
+      systemd:
+        name: httpd
+        enabled: yes
+        state: restarted
