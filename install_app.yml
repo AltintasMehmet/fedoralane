@@ -1,14 +1,12 @@
 ---
-- name: Install Netdata on Amazon Linux
+- name: Install Netdata on Amazon Linux 2023
   hosts: all
   become: yes
 
   tasks:
-    - name: Install required packages
+    - name: Ensure bash is installed (curl-minimal already exists)
       yum:
-        name:
-          - curl
-          - bash
+        name: bash
         state: present
 
     - name: Download Netdata kickstart script
@@ -22,7 +20,7 @@
       args:
         creates: /usr/sbin/netdata
 
-    - name: Ensure Netdata service is enabled and running
+    - name: Enable and start Netdata
       systemd:
         name: netdata
         enabled: yes
